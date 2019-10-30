@@ -10,17 +10,23 @@ public class Knapsack {
         this.weights = weights;
     }
 
-    public Integer c(Integer i, Integer j){
+    public Result c(Integer i, Integer j){
         count += 1;
         if(i==0 || j==0){
-            return 0;
+            return new Result();
         }
         if(weights[i-1] > j){
             return c(i-1, j);
         }
-        Integer pt1 = values[i-1]+c(i-1, j-weights[i-1]);
-        Integer pt2 = c(i-1,j);
-        return Math.max(pt1, pt2);
+        Result result1 = c(i-1, j-weights[i-1]);
+        result1.value += values[i-1];
+        result1.addItem(i);
+        Result result2 = c(i-1,j);
+        if(result1.value>result2.value){
+            return result1;
+        }else{
+            return result2;
+        }
     }
 
     public void reset(){
@@ -41,7 +47,7 @@ public class Knapsack {
         k.reset();
         ok.reset();
 
-        System.out.println("My version:");
+        /*System.out.println("My version:");
         System.out.println("Result: "+k.c(4,5));
         System.out.println("Count: "+k.getCount());
         System.out.println();
@@ -49,14 +55,20 @@ public class Knapsack {
         System.out.println("Result: "+ok.calc(4,5));
         System.out.println("Count: "+ok.getCount());
         k.reset();
-        ok.reset();
+        ok.reset();*/
 
-        for(int i = 0; i<=4; i++){
+        System.out.println("Result: "+k.c(4,5).toString());
+        System.out.println("Count: "+k.getCount());
+        System.out.println();
+        System.out.println("Result: "+ok.calc(4,5).toString());
+        System.out.println("Count: "+ok.getCount());
+
+        /*for(int i = 0; i<=4; i++){
             for(int j = 0; j<=5; j++){
                 System.out.print(k.c(i,j)+", ");
             }
             System.out.println();
-        }
+        }*/
 
         //random test
         /*Random r = new Random();

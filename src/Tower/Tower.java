@@ -1,17 +1,13 @@
 package Tower;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class Tower {
 
     /**
-     * does some preprocessing for the recursive function
-     * and calls the top level of it
-     * @param blockList the list of blocks that we have to work with
-     * @return the size of the largest stack that we can build with
-     * the list of blocks
+     * gets the highest tower that can be created from blocklist
+     * @param blockList the list of blocks we have to work with
+     * @return the height of the tallest tower
      */
     static int getTower(List<Block> blockList){
         //create a list of all of the possible rotations for each block
@@ -19,54 +15,55 @@ public class Tower {
         for(Block b: blockList){
             blocks.addAll(b.getRotations());
         }
-        //sort the blocks by height
+        //sort the blocks by base area
         blocks.sort(new BlockComparitor());
 
-        //start the DP recursive funtion
-        Result result =  c(blocks.size()-1, blocks.size()-1, blocks);
-
-        //print the result
-        for(Block b: result.tower){
+        //get each longest stackable sequence within blocks, increasing i
+        //then finds the highest one from them
+        Result max = new Result();
+        for(int i = 0; i<blocks.size(); i++){
+            //recursion!!!
+            Result r = l(i, blocks);
+            if(r.value > max.value){
+                max = r;
+            }
+        }
+        //list out the blocks
+        System.out.println();
+        for(Block b: max.tower){
             System.out.println(b);
         }
-        return result.value;
+        //return the max height
+        return max.value;
     }
 
     /**
-     * the recursive dynamic programming solution
-     * @param i the block that we are trying to add to the stack
-     * @param j the number of blocks that we can add
-     * @param blocks the list of total blocks (i should prbably just make this a class var)
-     * @return a result object with the height of the stack and the stack itself.
+     * recursive function for modified Longest Increasing Sequence.
+     * It finds the highest stackable sequence within blocks.
+     * @param i the last block in the sequence
+     * @param blocks list of all the blocks we have to work with
+     * @return a result with the current largest stackable sequence
      */
-    static Result c(int i, int j, List<Block> blocks){
-        //base case: if we dont have any blocks to work with we cant have a tower
-        if(i == 0 || j == 0){
-            return new Result();
+    static Result l(int i, List<Block> blocks){
+        //base case, we will just have the base block
+        if(i==0){
+            Result r = new Result();
+            r.addBlock(blocks.get(i));
+            return r;
         }
-
-        //the previus result; the result of not including the block we are looking at
-        Result cim1 = c(i-1,j, blocks).clone();
-
-        //if(there is a previous result and we cant fit the block on the tower, then
-        //we dont add the block to the tower
-        if(cim1.tower.size()!=0 && !blocks.get(i).canFitOn(cim1.tower.peek())){
-            return cim1;
-        }else{
-            //if we can fit the block on the tower then we check to see if adding the block would be higher
-            Result prev = cim1;
-
-            Result withBlock = c(i-1, j-1, blocks).clone();
-            withBlock.value += blocks.get(i).height;
-            withBlock.tower.push(blocks.get(i));
-
-            if(prev.value > withBlock.value){
-                return prev;
-            }else{
-                return withBlock;
+        //finds the max(l(j)) where 0<j<i and block(i) can fit on block(j)
+        Result max = new Result();
+        for(int j = 0; j<i; j++){
+            if(blocks.get(i).canFitOn(blocks.get(j))){
+                Result r = l(j, blocks).clone();
+                if(r.value > max.value){
+                    max = r;
+                }
             }
         }
-
+        //adds the current block to the stack
+        max.addBlock(blocks.get(i));
+        return max;
     }
 
     /**
@@ -88,8 +85,16 @@ public class Tower {
     public static void main(String[] args) {
         List<Block> blocks = new ArrayList<>();
         blocks.add(new Block(1,2,3));
+        blocks.add(new Block(3,2,1));
         blocks.add(new Block(3,4,5));
-        blocks.add(new Block(99,99,100));
+        blocks.add(new Block(3,2,100));
+        blocks.add(new Block(100,100,1));
+        blocks.add(new Block(100,1,100));
+        blocks.add(new Block(100,100,1));
+        blocks.add(new Block(1,100,100));
+        blocks.add(new Block(99,99,99));
         System.out.println(getTower(blocks));
     }
 }
+
+

@@ -7,13 +7,11 @@ public class Block {
     int width; //base
     int height;
     int depth; //base
-
     public Block(int width, int depth, int height){
         this.width = width;
         this.height = height;
         this.depth = depth;
     }
-
     /**
      * gets a list of possible rotations including not rotating it at all
      * @return
@@ -28,7 +26,6 @@ public class Block {
         ret.add(new Block(this.depth, this.width, this.height));
         return ret;
     }
-
     /**
      * checks to see if this block can fit on block b
      * @param b the block to use as a base
